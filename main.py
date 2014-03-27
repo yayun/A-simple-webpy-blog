@@ -26,7 +26,7 @@ render=render_jinja('templates',encoding='utf-8',globals={'session':session})# �
 #首页显示
 class index(object):
     def GET(self):
-        articles = web.ctx.orm.query(db.article).order_by(article.id)
+        articles = web.ctx.orm.query(db.Article).order_by(Article.id)
         article_num=len(articles)
         '''title=[]
         time=[]
@@ -64,15 +64,15 @@ class register(object):
         f=self.register_form()
         if not f.validates():
             return render.register(form=f,re_log=self.register)
-        if  web.ctx.orm.query(db.user).filter_by(user_name=f.d.username)!=None:
+        if  web.ctx.orm.query(db.User).filter_by(user_name=f.d.username)!=None:
             return render.register(msg=u"用户名已经存在",form=f,re_log=self.register) 
-        if web.ctx.orm.query(db.user).filter_by(email=f.d.email)!=None:
+        if web.ctx.orm.query(db.User).filter_by(email=f.d.email)!=None:
             return render.register(msg=u"邮箱已经被占用",form=f,re_log=self.register) 
         re=mail.sendmail(f.d.email) 
         if re==None:
             return render.register(msg=u"对不起 我们找不到你填入的邮箱地址 请输入有效的邮箱地址",form=f,re_log=self.register)
         else :
-            user_add=db.user()
+            user_add=db.User()
             user_add.user_name=f.d.username
             user_add.psw=f.d.password
             user_add.email=f.d.email
@@ -95,7 +95,7 @@ class log(object):
         f=self.log_form()
         if not f.validates():
             return render.register(form=f,re_log=self.log)
-        if web.ctx.orm.query(db.user).filter_by(user_name=f.d.username,psw=f.d.password)==None:
+        if web.ctx.orm.query(db.User).filter_by(user_name=f.d.username,psw=f.d.password)==None:
             return render.register(msg=u"用户名或密码错误",form=f,re_log=self.log)
         else:
             session.name=f.d.username
@@ -128,7 +128,7 @@ class create_post(object):
         if session.name==None:
             return render.new_post(post_err=u"对不起你没有",form=f)
         else:
-            add_post=db.article()
+            add_post=db.Article()
             add_post.title=f.d.title
             add_post.content=f.d.content
             add_post.tag=f.d.tag
